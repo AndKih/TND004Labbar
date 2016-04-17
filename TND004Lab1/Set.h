@@ -176,8 +176,11 @@ template<typename T>
 void Set<T>::make_empty()
 {
     if(!_empty()){
+        shared_ptr<Node> tmp = head->next;
         while(head->next->next){
-            head->next = head->next->next;
+            head->next.reset();
+            head->next = tmp->next;
+            tmp = tmp->next;
         }
         tail->prev = head;
     }
@@ -196,16 +199,98 @@ Set<T>& Set<T>::operator=(const Set s)
 template<typename T>
 Set<T>& Set<T>::operator+=(const Set& s)
 {
+    if(!s._empty()){
+        Set set_tmp(*this);
+        shared_ptr<Node> tmp = set_tmp.head->next;
+        shared_ptr<Node> s_tmp = s.head->next;
+        make_empty();
+
+        while(tmp->next && s_tmp->next){
+            if(tmp->value > s_tmp->value){
+                insert(s_tmp->value);
+                s_tmp = s_tmp->next;
+            }
+            else if(tmp->value < s_tmp->value){
+                insert(tmp->value);
+                tmp = tmp->next;
+            }
+            else{
+                insert(tmp->value);
+                tmp = tmp->next;
+                s_tmp = s_tmp->next;
+            }
+        }
+        while(tmp->next){
+            insert(tmp->value);
+            tmp = tmp->next;
+        }
+        while(s_tmp->next){
+            insert(s_tmp->value);
+            s_tmp = s_tmp->next;
+        }
+    }
     return *this;
 }
 template<typename T>
 Set<T>& Set<T>::operator*=(const Set& s)
 {
+    if(s._empty()){
+        make_empty();
+    }
+    else{
+        Set set_tmp(*this);
+        shared_ptr<Node> tmp = set_tmp.head->next;
+        shared_ptr<Node> s_tmp = s.head->next;
+        make_empty();
+
+        while(s_tmp->next && tmp->next){
+            if(tmp->value > s_tmp->value){
+                s_tmp = s_tmp->next;
+            }
+            else if(tmp->value < s_tmp->value){
+                tmp = tmp->next;
+            }
+            else{
+                insert(tmp->value);
+                tmp = tmp->next;
+                s_tmp = s_tmp->next;
+            }
+        }
+    }
     return *this;
 }
 template<typename T>
 Set<T>& Set<T>::operator-=(const Set& s)
 {
+    if(!s._empty()){
+        Set set_tmp(*this);
+        shared_ptr<Node> tmp = set_tmp.head->next;
+        shared_ptr<Node> s_tmp = s.head->next;
+        make_empty();
+
+        while(s_tmp->next && tmp->next){
+            if(tmp->value > s_tmp->value){
+                insert(s_tmp->value);
+                s_tmp = s_tmp->next;
+            }
+            else if(tmp->value < s_tmp->value){
+                insert(tmp->value);
+                tmp = tmp->next;
+            }
+            else{
+                tmp = tmp->next;
+                s_tmp = s_tmp->next;
+            }
+        }
+        while(tmp->next){
+            insert(tmp->value);
+            tmp = tmp->next;
+        }
+        while(s_tmp->next){
+            insert(s_tmp->value);
+            s_tmp = s_tmp->next;
+        }
+    }
     return *this;
 }
 template<typename T>

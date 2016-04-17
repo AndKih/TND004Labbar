@@ -123,7 +123,7 @@ int main()
 
     cout << "S1.cardinality() = "
          << S1.cardinality() << endl;
-return 0;
+
     /*****************************************************
     * TEST PHASE 8                                       *
     * Overloaded operators: operator+=, operator*=       *
@@ -138,7 +138,7 @@ return 0;
     cout << "S6 = " << S6 << endl;
     cout << "S4 = " << S4 << endl;
     cout << "S1 = " << S1 << endl;
-
+return 0;
 
     /*****************************************************
     * TEST PHASE 9                                       *
