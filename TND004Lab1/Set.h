@@ -14,7 +14,7 @@ public:
     Set(const T& val);
     Set(const T val[], int n);
     Set(const Set& s);
-    Set(const Set&& s) noexcept;
+    Set(Set&& s) noexcept;
     ~Set();
 
     bool _empty() const;
@@ -22,8 +22,7 @@ public:
     bool is_member(const T& val) const;
     void make_empty();
 
-    Set operator=(Set s);
-
+    Set& operator=(const Set s);
     Set& operator+=(const Set& s);
     Set& operator*=(const Set& s);
     Set& operator-=(const Set& s);
@@ -122,17 +121,12 @@ Set<T>::Set(const Set& s)
     }
 }
 template<typename T>
-Set<T>::Set(const Set&& s) noexcept
+Set<T>::Set(Set&& s) noexcept
 {
-    head = make_shared<Node>(T(), nullptr, weak_ptr<Node>());
-    tail = make_shared<Node>(T(), nullptr, head);
-    head->next = tail;
-    shared_ptr<Node> tempPtr = s.head->next;
-    while(tempPtr->next)
-    {
-        insert(tempPtr->value);
-        tempPtr = tempPtr->next;
-    }
+    *this = Set();
+
+    swap(head, s.head);
+    swap(tail, s.tail);
 }
 template<typename T>
 Set<T>::~Set()
@@ -159,38 +153,144 @@ bool Set<T>::_empty() const
 template<typename T>
 int Set<T>::cardinality() const
 {
-    return 1;
+    shared_ptr<Node> tmp = head->next;
+    int n = 0;
+    while(tmp->next){
+        n++;
+        tmp = tmp->next;
+    }
+    return n;
 }
 template<typename T>
 bool Set<T>::is_member(const T& val) const
 {
+    shared_ptr<Node> tmp = head->next;
+    while(tmp->next){
+        if(tmp->value == val)
+            return true;
+        tmp = tmp->next;
+    }
     return false;
 }
 template<typename T>
 void Set<T>::make_empty()
 {
+    if(!_empty()){
+        shared_ptr<Node> tmp = head->next;
+        while(head->next->next){
+            head->next.reset();
+            head->next = tmp->next;
+            tmp = tmp->next;
+        }
+        tail->prev = head;
+    }
     return;
+
 }
 
 template<typename T>
-Set<T> Set<T>::operator=(Set s)
+Set<T>& Set<T>::operator=(const Set s)
 {
-    //cout << "S2: " << s2 << "\n";
-    return Set<T>(s);
+    Set tmp(s);
+    swap(head, tmp.head);
+    swap(tail, tmp.tail);
+    return *this;
 }
 template<typename T>
 Set<T>& Set<T>::operator+=(const Set& s)
 {
+    if(!s._empty()){
+        Set set_tmp(*this);
+        shared_ptr<Node> tmp = set_tmp.head->next;
+        shared_ptr<Node> s_tmp = s.head->next;
+        make_empty();
+
+        while(tmp->next && s_tmp->next){
+            if(tmp->value > s_tmp->value){
+                insert(s_tmp->value);
+                s_tmp = s_tmp->next;
+            }
+            else if(tmp->value < s_tmp->value){
+                insert(tmp->value);
+                tmp = tmp->next;
+            }
+            else{
+                insert(tmp->value);
+                tmp = tmp->next;
+                s_tmp = s_tmp->next;
+            }
+        }
+        while(tmp->next){
+            insert(tmp->value);
+            tmp = tmp->next;
+        }
+        while(s_tmp->next){
+            insert(s_tmp->value);
+            s_tmp = s_tmp->next;
+        }
+    }
     return *this;
 }
 template<typename T>
 Set<T>& Set<T>::operator*=(const Set& s)
 {
+    if(s._empty()){
+        make_empty();
+    }
+    else{
+        Set set_tmp(*this);
+        shared_ptr<Node> tmp = set_tmp.head->next;
+        shared_ptr<Node> s_tmp = s.head->next;
+        make_empty();
+
+        while(s_tmp->next && tmp->next){
+            if(tmp->value > s_tmp->value){
+                s_tmp = s_tmp->next;
+            }
+            else if(tmp->value < s_tmp->value){
+                tmp = tmp->next;
+            }
+            else{
+                insert(tmp->value);
+                tmp = tmp->next;
+                s_tmp = s_tmp->next;
+            }
+        }
+    }
     return *this;
 }
 template<typename T>
 Set<T>& Set<T>::operator-=(const Set& s)
 {
+    if(!s._empty()){
+        Set set_tmp(*this);
+        shared_ptr<Node> tmp = set_tmp.head->next;
+        shared_ptr<Node> s_tmp = s.head->next;
+        make_empty();
+
+        while(s_tmp->next && tmp->next){
+            if(tmp->value > s_tmp->value){
+                insert(s_tmp->value);
+                s_tmp = s_tmp->next;
+            }
+            else if(tmp->value < s_tmp->value){
+                insert(tmp->value);
+                tmp = tmp->next;
+            }
+            else{
+                tmp = tmp->next;
+                s_tmp = s_tmp->next;
+            }
+        }
+        while(tmp->next){
+            insert(tmp->value);
+            tmp = tmp->next;
+        }
+        while(s_tmp->next){
+            insert(s_tmp->value);
+            s_tmp = s_tmp->next;
+        }
+    }
     return *this;
 }
 template<typename T>

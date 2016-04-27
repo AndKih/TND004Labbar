@@ -138,7 +138,7 @@ int main()
     cout << "S6 = " << S6 << endl;
     cout << "S4 = " << S4 << endl;
     cout << "S1 = " << S1 << endl;
-
+return 0;
 
     /*****************************************************
     * TEST PHASE 9                                       *

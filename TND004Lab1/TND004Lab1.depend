@@ -13,3 +13,14 @@
 1460633432 source:h:\oop\tnd004\lab1\tnd004lab1\set.cpp
 	"Set.h"
 
+1460895419 source:d:\git\tnd004labbar\tnd004lab1\main.cpp
+	<iostream>
+	<iomanip>
+	<string>
+	"Set.h"
+
+1460895455 d:\git\tnd004labbar\tnd004lab1\set.h
+	"memory"
+	"utility"
+	"iostream"
+
